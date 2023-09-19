@@ -6,36 +6,65 @@
 
 The size encoding format efficiently represents sizes, including array and string sizes, as well as other unsigned numbers. It prioritizes smaller sizes commonly encountered in real-world applications to optimize storage space. The format utilizes variable-length encoding, using fewer bytes for smaller sizes while still accommodating larger sizes when needed. By striking a balance between space optimization and scalability, it ensures efficient storage and transmission of size information for various applications.
 
-The size encoding format utilizes a variable number of bytes to represent the size. The number of bytes used depends on the magnitude of the size being encoded. The format follows a scheme where the size is represented in one, two, three, or four bytes.
+The size encoding format utilizes a variable number of bytes to represent the size. The number of bytes used depends on the magnitude of the size being encoded. The format follows a scheme where the size is represented in one - five bytes(4).
 
 #### Encoding Rules:
 
 The encoding of the size follows the following rules:
 
-- If the size value is less than 248, it is represented in a single byte. The size value is stored directly in the byte.
-- If the size value is 248 or larger and less than 503, it is represented in two bytes. The first byte is set to 249, and the second byte stores the size value minus 248.
-- If the size value is 503 or larger and less than 65536, it is represented in three bytes. The first byte is set to 250, and the following two bytes store the size value minus 503.
-- If the size value is 65536 or larger and less than 4294967296, it is represented in four bytes. The first byte is set to 251, and the following four bytes store the size value minus 65536.
+1. If the size value is less than 248, it can be represented in a single byte.
+2. If the size value is greater than 248 and less than 503, the first byte is set to 248, and the second byte stores the value minus 248.
+3. If the size value is 503 or larger and less than 65536, it is represented in three bytes. The first byte is set to 249, and the following two bytes store the value in little-endian order.
+4. If the size value is 65536 or larger and less than 16777216, it is represented in four bytes. The first byte is set to 250, and the following three bytes store the value in little-endian order.
+5. If the size value is 16777216 or larger and less than 4294967296, it is represented in five bytes. The first byte is set to 251, and the following four bytes store the value in little-endian order.
 
-#### Example:
+By subtracting 248 from small values, the size encoding format can represent a larger range of values within the constraints of two bytes. This optimization allows for efficient representation of small sizes while minimizing the number of bytes required.
 
-Let's consider a few examples to illustrate the size encoding format:
+#### Encoding Examples
+Example 1: Encoding a size value of 150
+   - Since 150 is less than 248, apply Rule 1.
+   - Single byte: 0x96
+   - Encoding: 0x96
 
-1. If the size value is 150, it is less than 248, so it can be represented in a single byte. The binary representation of 150 is 10010110. Therefore, the size encoding for 150 would be: 10010110.
+Example 2: Encoding a size value of 350
+   - Since 350 falls into the range greater than 248 and less than 503, apply Rule 2.
+   - Difference: 350 - 248 = 102
+   - First byte: 0xF8
+   - Second byte: 0x66 (decimal 102)
+   - Encoding: 0xF8 0x66
 
-2. If the size value is 350, it is larger than 248 and less than 503, so it is represented in two bytes. The first byte is set to 249, and the second byte stores the value 350 - 248 = 102. The binary representation of 102 is 01100110. Therefore, the size encoding for 350 would be: 11111001 01100110.
+Example 3: Encoding a size value of 1200
+   - Since 1200 falls into the range greater than 503 and less than 65536, apply Rule 3.
+   - Hexadecimal: 0x4B0
+   - First byte: 0xF9
+   - Second byte: 0xB0 (least significant byte)
+   - Third byte: 0x04 (most significant byte)
+   - Encoding: 0xF9 0xB0 0x04
 
-3. If the size value is 1200, it is larger than 503 and less than 65536, so it is represented in three bytes. The first byte is set to 250, and the following two bytes store the value 1200 - 503 = 697. The binary representation of 697 is 10 10101001. Therefore, the size encoding for 1200 would be: 11111010 10 10101001.
+Example 3: Encoding a size value of 120000
+   - Since 120000 is greater than 65536 and less than 16777216, apply Rule 4.
+   - Hexadecimal: 0x1D4C0
+   - First byte: 0xFA
+   - Second byte: 0xC0 (least significant byte)
+   - Third byte: 0x4C
+   - Fourth byte: 0x01 (most significant byte)
+   - Encoding: 0xFA 0xC0 0x4C 0x01
 
-4. If the size value is 100000, it is larger than 65536 and less than 4294967296, so it is represented in four bytes. The first byte is set to 251, and the following four bytes store the value 100000 - 65536 = 34464. The binary representation of 34464 is 100001100100000. Therefore, the size encoding for 100000 would be: 11111011 10000110 01000000.
+Example 4: Encoding a size value of 26777216
+   - Since 26777216 falls into the range greater than 16777216 and less than 4294967296, apply Rule 4:
+   - Hexadecimal: 0x1999990
+   - First byte: 0xFB
+   - Second byte: 0x90 (least significant byte)
+   - Third byte: 0x99
+   - Fourth byte: 0x99
+   - Fifth byte: 0x19 (most significant byte)
+   - Encoding: 0xFB 0x90 0x99 0x99 0x19
 
 #### Usage:
 
 To utilize the size encoding format, the decoding process involves examining the bytes and reconstructing the original size value. If the first byte is less than 248, it represents the size directly. If the first byte is 249, 250, or 251, the subsequent bytes store the size value minus a predefined offset.
 
 Please note that this size encoding format can accommodate sizes up to 4294967295 (4 bytes). If you require support for larger sizes, you may need to extend the encoding scheme accordingly.
-
-Certainly! Here's a combined overview of the array encoding format, incorporating the previous explanations:
 
 ### Array Encoding Format
 
