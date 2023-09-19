@@ -19,3 +19,5 @@ YABE offers several key features that make it a valuable encoding format:
 In YABE (Yet Another Binary Encoding), keys are represented as strings and can be sorted for faster lookup. Duplicate keys are eliminated by referencing them with indices. Values are grouped and indexed, eliminating the need for explicit data type encoding. The object structure is stored using key and value indices, enabling fast decoding comparable to array indexing and pointer dereferencing. This approach eliminates the need for constructing a DOM object in memory, resulting in efficient processing, reduced memory usage, and a concise binary encoding format for key-value data.
 
 ## Specification
+
+[Specification](specification.md)
