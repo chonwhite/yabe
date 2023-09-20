@@ -18,6 +18,27 @@ YABE offers several key features that make it a valuable encoding format:
 
 In YABE (Yet Another Binary Encoding), keys are represented as strings and can be sorted for faster lookup. Duplicate keys are eliminated by referencing them with indices. Values are grouped and indexed, eliminating the need for explicit data type encoding. The object structure is stored using key and value indices, enabling fast decoding comparable to array indexing and pointer dereferencing. This approach eliminates the need for constructing a DOM object in memory, resulting in efficient processing, reduced memory usage, and a concise binary encoding format for key-value data.
 
+## Benchmarks
+
+TODO
+
 ## Specification
 
 [Specification](specification.md)
+
+## Implementations
+
+- [C++](https://github.com/chonwhite/yabe-cpp)
+- [Java](https://github.com/chonwhite/yabe-java)
+
+## Contributing
+We welcome all types of contributions, including but not limited to:
+
+- Bug fixes
+- Feature enhancements
+- Documentation improvements
+- Code optimizations
+- Test coverage expansions
+- Different language implementations
+
+If you have any ideas or suggestions, please feel free to open an issue to discuss them further.

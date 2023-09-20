@@ -6,65 +6,40 @@
 
 The size encoding format efficiently represents sizes, including array and string sizes, as well as other unsigned numbers. It prioritizes smaller sizes commonly encountered in real-world applications to optimize storage space. The format utilizes variable-length encoding, using fewer bytes for smaller sizes while still accommodating larger sizes when needed. By striking a balance between space optimization and scalability, it ensures efficient storage and transmission of size information for various applications.
 
-The size encoding format utilizes a variable number of bytes to represent the size. The number of bytes used depends on the magnitude of the size being encoded. The format follows a scheme where the size is represented in one - five bytes(4).
+The size encoding format utilizes a variable number of bytes to represent the size. The number of bytes used depends on the magnitude of the size being encoded. The format follows a scheme where the size is represented in one - nine bytes.
 
 #### Encoding Rules:
 
 The encoding of the size follows the following rules:
+Encoding Rules:
 
-1. If the size value is less than 248, it can be represented in a single byte.
-2. If the size value is greater than 248 and less than 503, the first byte is set to 248, and the second byte stores the value minus 248.
-3. If the size value is 503 or larger and less than 65536, it is represented in three bytes. The first byte is set to 249, and the following two bytes store the value in little-endian order.
-4. If the size value is 65536 or larger and less than 16777216, it is represented in four bytes. The first byte is set to 250, and the following three bytes store the value in little-endian order.
-5. If the size value is 16777216 or larger and less than 4294967296, it is represented in five bytes. The first byte is set to 251, and the following four bytes store the value in little-endian order.
+- If the size value is less than 248, it can be represented in a single byte.
+- If the size value is greater than or equal to 248 and less than 65536, it is represented in three bytes. The first byte is set to 248, and the following byte stores the value in little-endian order.
+- If the size value is greater than or equal to 65536 and less than 4294967296, it is represented in five bytes. The first byte is set to 249, and the following three bytes store the value in little-endian order.
+- If the size value is greater than or equal to 4294967296, it is represented in nine bytes. The first byte is set to 250, and the following eight bytes store the value in little-endian order.
 
-By subtracting 248 from small values, the size encoding format can represent a larger range of values within the constraints of two bytes. This optimization allows for efficient representation of small sizes while minimizing the number of bytes required.
-
-#### Encoding Examples
 Example 1: Encoding a size value of 150
-   - Since 150 is less than 248, apply Rule 1.
-   - Single byte: 0x96
-   - Encoding: 0x96
+- Since 150 is less than 248, it can be represented in a single byte: 0x96.
+- Single byte: 0x96
+- Encoding: 0x96
 
 Example 2: Encoding a size value of 350
-   - Since 350 falls into the range greater than 248 and less than 503, apply Rule 2.
-   - Difference: 350 - 248 = 102
-   - First byte: 0xF8
-   - Second byte: 0x66 (decimal 102)
-   - Encoding: 0xF8 0x66
+- Since 350 falls into the range greater than or equal to 248 and less than 65536, apply the Rule 2.
+- First byte: 0xF8 (248)
+- Hex Encoding: 0x015E (350 in little-endian order)
+- Encoding: 0xF8 0x5E 0x01
 
-Example 3: Encoding a size value of 1200
-   - Since 1200 falls into the range greater than 503 and less than 65536, apply Rule 3.
-   - Hexadecimal: 0x4B0
-   - First byte: 0xF9
-   - Second byte: 0xB0 (least significant byte)
-   - Third byte: 0x04 (most significant byte)
-   - Encoding: 0xF9 0xB0 0x04
+Example 3: Encoding a size value of 26797236
+- Since 26797236 is greater than or equal to 65536 and less than 4294967296, apply Rule 3.
+- First byte: 0xF9 (249)
+- The following four bytes represent the value 26797236 in little-endian order: 0x04 0x07 0x61 0x01.
+- Encoding: 0xF9 0x04 0x07 0x61 0x01
 
-Example 3: Encoding a size value of 120000
-   - Since 120000 is greater than 65536 and less than 16777216, apply Rule 4.
-   - Hexadecimal: 0x1D4C0
-   - First byte: 0xFA
-   - Second byte: 0xC0 (least significant byte)
-   - Third byte: 0x4C
-   - Fourth byte: 0x01 (most significant byte)
-   - Encoding: 0xFA 0xC0 0x4C 0x01
-
-Example 4: Encoding a size value of 26777216
-   - Since 26777216 falls into the range greater than 16777216 and less than 4294967296, apply Rule 4:
-   - Hexadecimal: 0x1999990
-   - First byte: 0xFB
-   - Second byte: 0x90 (least significant byte)
-   - Third byte: 0x99
-   - Fourth byte: 0x99
-   - Fifth byte: 0x19 (most significant byte)
-   - Encoding: 0xFB 0x90 0x99 0x99 0x19
-
-#### Usage:
-
-To utilize the size encoding format, the decoding process involves examining the bytes and reconstructing the original size value. If the first byte is less than 248, it represents the size directly. If the first byte is 249, 250, or 251, the subsequent bytes store the size value minus a predefined offset.
-
-Please note that this size encoding format can accommodate sizes up to 4294967295 (4 bytes). If you require support for larger sizes, you may need to extend the encoding scheme accordingly.
+Example 4: Encoding a size value of 8294967230
+- Since 8294967230 is greater than or equal to 4294967296, we apply Rule 4.
+- First byte: 0xFA (250)
+- The following eight bytes represent the value 8294967230 in little-endian order: 0xCE 0x0F 0x8B 0x91 0x4E 0x00 0x00 0x00.
+- Encoding: 0xFA 0xCE 0x0F 0x8B 0x91 0x4E 0x00 0x00 0x00
 
 ### Array Encoding Format
 
