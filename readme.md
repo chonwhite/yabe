@@ -31,6 +31,14 @@ TODO
 - [C++](https://github.com/chonwhite/yabe-cpp)
 - [Java](https://github.com/chonwhite/yabe-java)
 
+## Agenda
+
+- Converting back and forth to JSON
+- Working with the Document Object Model (DOM)
+- Supporting various programming languages (C++, Java, JavaScript, etc.)
+- Schema definition and extraction
+- Interface Definition Language (IDL)
+
 ## Contributing
 We welcome all types of contributions, including but not limited to:
 

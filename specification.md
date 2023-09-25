@@ -79,3 +79,132 @@ Here's a general overview of how different data types can be encoded within the 
 - **Floats**: Floats can be encoded using a specific encoding format, such as the IEEE 754 64-bit double precision format. Float arrays can be represented similarly to other arrays. The encoding process involves encoding the size of the float array using the size encoding format and then encoding the content of each float element using the specified float encoding format.
 
 Integers, booleans, and nulls were left out because they follow different encoding patterns. They will be introduced separately due to their specific encoding schemes, which differ from the array encoding format discussed earlier.
+
+Apologies for the confusion in the previous response. Here's the corrected description of the map encoding format for null, true, and false values:
+
+### IndexedMap Encoding 
+
+The IndexedMap encoding format efficiently represents key-value maps by utilizing the array encoding format. It follows the following rules:
+
+To encode a map object, follow these steps:
+
+1. Sort the keys using the Unicode Collation Algorithm (UCA) and eliminate any duplicate keys.
+2. Create a key array that contains the sorted and unique keys.
+3. Create a value array that contains the corresponding values for each key.
+4. Encode the map object as an array using the array encoding format:
+   - For each key-value pair, key index and the value index.
+   - The key index is the index of the key in the key array.
+   - The value index is the index of the value in the value array.
+
+#### Encoding Rule for Null, True, and False Values
+
+- Null Value: If a value is null, it is represented by the value index of 0.
+- True Value: If a value is true, it is represented by the value index of 1.
+- False Value: If a value is false, it is represented by the value index of 2.
+
+#### Example
+
+Consider the map object:
+
+```
+{
+  "name": "John",
+  "age": 30,
+  "city": "New York"
+}
+```
+
+To encode this map object , we follow these steps:
+
+1. Sorting Keys: We sort the keys of the map object using a specified sorting algorithm. In this example, the sorted keys are: "age", "city", "name".
+
+2. Key Array: We create a key array that contains the sorted keys. In this case, the key array would be: ["age", "city", "name"].
+
+3. Value Array: We create a value array that contains the corresponding values for each key. In this example, the grouped value array would be: ["John", "New York", 30]. The values of the same type are grouped together.
+
+4. Encoding Key-Value Pairs: Using the key array and value array, we encode the key-value pairs as an array. Each element represents a key-value pair, where the first element is the key index and the second element is the value index.
+
+Using the key array and grouped value array from the example, the encoded representation would be:
+
+```
+[
+  {0, 2},  // Key index 0 ("age") and value index 2 ("John")
+  {1, 3},  // Key index 1 ("city") and value index 3 ("New York")
+  {2, 4}   // Key index 2 ("name") and value index 4 (30)
+]
+```
+
+### Schema
+
+Suppose we have a class called `Person` with the following properties:
+
+```java
+class Person {
+   String name;
+   int age;
+   String address;
+}
+```
+
+
+To map this `Person` class into a schema structure, we can define the following components:
+
+1. **Keys**: We can consider the properties (`name`, `age`, and `address`) as the keys of the map. So, the `Keys` component will be `["address", "age", "name"]`.
+
+2. **IndexedMap**: In the `IndexedMap` component, we define the key-value pairs using indices. For example, we can assign index 3 to `name`, index 4 to `address` and index 5 to `age`. So, the `KeyValuePairs` component of `IndexedMap` will be:
+
+   ````json
+   KeyValuePairs: [
+     {KeyIndex: 2, ValueIndex: 3},
+     {KeyIndex: 1, ValueIndex: 5},
+     {KeyIndex: 0, ValueIndex: 4}
+   ]
+   ```
+
+3. **TypeName**: The `TypeName` component represents the type of the map. In this case, we can set it as `"Person"`.
+
+
+Let's say we have a list of `Person` objects, and each object has properties like `name`, `age`, and `address`. To make the data representation more efficient, we can use a schema.
+
+Here's an example schema for the `Person` class:
+
+```json
+Schema:
+{
+   "Keys": ["address", "age", "name"],
+   "Values": [$name, $address, $age],
+   "IndexedMap": {
+      "KeyValuePairs": [
+         {"KeyIndex": 2, "ValueIndex": 3}, // value index start from 3;
+         {"KeyIndex": 1, "ValueIndex": 5}, // ints goes after strings;
+         {"KeyIndex": 0, "ValueIndex": 4} 
+      ]
+   },
+   "TypeName": "Person"
+}
+```
+
+Now, let's consider a list of `Person` objects:
+
+```json
+List of Persons:
+[
+   {"name": "John", "age": 30, "address": "123 Main St"},
+   {"name": "Sarah", "age": 25, "address": "456 Elm St"}
+]
+```
+
+Using the schema, we can encode the objects as follows:
+
+```json
+Encoded List:
+[
+   {"John", "123 Main St", 30},
+   {"Sarah", "456 Elm St", 25}
+]
+```
+
+In the encoded list, instead of repeating the keys for each object, we use the indices from the schema to represent the properties. For example, `3` represents the value of `"name"`, `5` represents the value of `"age"`, and `4` represents the value of `"address"`.
+
+By referencing the schema and using indices, we eliminate the need to repeat the keys for each object, resulting in a more compact representation of the data. This approach is particularly useful when dealing with large lists of objects with similar structures, as it reduces redundancy and improves efficiency in terms of storage and processing.
+
