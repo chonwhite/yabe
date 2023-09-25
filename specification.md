@@ -153,8 +153,9 @@ To map this `Person` class into a schema structure, we can define the following 
 
 2. **IndexedMap**: In the `IndexedMap` component, we define the key-value pairs using indices. For example, we can assign index 3 to `name`, index 4 to `address` and index 5 to `age`. So, the `KeyValuePairs` component of `IndexedMap` will be:
 
-   ````json
-   KeyValuePairs: [
+   ```json
+   KeyValuePairs: 
+   [
      {KeyIndex: 2, ValueIndex: 3},
      {KeyIndex: 1, ValueIndex: 5},
      {KeyIndex: 0, ValueIndex: 4}
